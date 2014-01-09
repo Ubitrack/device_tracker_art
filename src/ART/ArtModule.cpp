@@ -574,7 +574,7 @@ void ArtModule::HandleReceive (const boost::system::error_code err, size_t lengt
 
 				lastpos = findpos+1;
 
-				boost::shared_ptr< std::vector< Ubitrack::Math::Vector< 3 > > > cloud( new std::vector< Ubitrack::Math::Vector< 3 > > );
+				boost::shared_ptr< std::vector< Ubitrack::Math::Vector< double, 3 > > > cloud( new std::vector< Ubitrack::Math::Vector< double, 3 > > );
 
 				for (int i=0; i<numOfRecords; ++i)
 				{
@@ -594,7 +594,7 @@ void ArtModule::HandleReceive (const boost::system::error_code err, size_t lengt
 					lastpos += readChars;
 					recordC += readChars;
 
-					Ubitrack::Math::Vector< 3 > pos (rot);
+					Ubitrack::Math::Vector< double, 3 > pos (rot);
 					cloud->push_back( pos / 1000.0 );
 
 					lastpos += 1;
@@ -629,7 +629,7 @@ void ArtModule::HandleReceive (const boost::system::error_code err, size_t lengt
 }
 
 
-void ArtModule::trySendPose( boost::shared_ptr< std::vector< Ubitrack::Math::Vector < 3 > > > cloud, Ubitrack::Measurement::Timestamp ts )
+void ArtModule::trySendPose( boost::shared_ptr< std::vector< Ubitrack::Math::Vector < double, 3 > > > cloud, Ubitrack::Measurement::Timestamp ts )
 {
 	// 3D Cloud always has ID 1 for now..
 	ArtComponentKey key( 0, ArtComponentKey::target_3dcloud );
@@ -677,8 +677,8 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
     if ( hasComponent( key ) )
     {
         // generate pose
-        Ubitrack::Math::Vector< 3 > position ( rot[0]/1000.0, rot[1]/1000.0, rot[2]/1000.0 );
-        Ubitrack::Math::Matrix< 3, 3 > rotMatrix ( mat );
+        Ubitrack::Math::Vector< double, 3 > position ( rot[0]/1000.0, rot[1]/1000.0, rot[2]/1000.0 );
+        Ubitrack::Math::Matrix< double, 3, 3 > rotMatrix ( mat );
         Ubitrack::Math::Quaternion rotation ( rotMatrix );
         Ubitrack::Measurement::Pose pose( ts, Ubitrack::Math::Pose( rotation, position ) );
 
@@ -706,8 +706,8 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
     if ( hasComponent( key ) )
     {
         // generate pose
-        Ubitrack::Math::Vector< 3 > position ( rot[0]/1000.0, rot[1]/1000.0, rot[2]/1000.0 );
-        Ubitrack::Math::Matrix< 3, 3 > rotMatrix ( mat );
+        Ubitrack::Math::Vector< double, 3 > position ( rot[0]/1000.0, rot[1]/1000.0, rot[2]/1000.0 );
+        Ubitrack::Math::Matrix< double, 3, 3 > rotMatrix ( mat );
         Ubitrack::Math::Quaternion rotation ( rotMatrix );
         Ubitrack::Measurement::Pose pose( ts, Ubitrack::Math::Pose( rotation, position ) );
 

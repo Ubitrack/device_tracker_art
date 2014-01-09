@@ -247,7 +247,7 @@ protected:
 private:
     void trySendPose( int id, ArtComponentKey::TargetType type, double qual, double* rot, double* mat, Ubitrack::Measurement::Timestamp ts );
 	void trySendPose( int id, ArtComponentKey::TargetType type, double qual, double* rot, double* mat, Ubitrack::Measurement::Timestamp ts, ArtComponentKey::FingerType f, ArtComponentKey::FingerSide s );
-	void trySendPose( boost::shared_ptr< std::vector< Ubitrack::Math::Vector < 3 > > > cloud, Ubitrack::Measurement::Timestamp ts );
+	void trySendPose( boost::shared_ptr< std::vector< Ubitrack::Math::Vector < double, 3 > > > cloud, Ubitrack::Measurement::Timestamp ts );
 };
 
 
