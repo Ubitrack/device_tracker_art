@@ -212,6 +212,7 @@ protected:
 	FingerSide m_fingerSide;
 };
 
+std::ostream& operator<<( std::ostream& s, const ArtComponentKey& k );
 
 /**
  * Module for ART tracker.

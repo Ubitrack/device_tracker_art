@@ -716,6 +716,13 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
     }
 }
 
+std::ostream& operator<<( std::ostream& s, const ArtComponentKey& k )
+{
+        s << "ArtComponent[ " << k.getBody() << " "
+                             << k.getTargetType() << " ]";
+        return s;
+}
+
 // register module at factory
 UBITRACK_REGISTER_COMPONENT( ComponentFactory* const cf ) {
 	cf->registerModule< ArtModule > ( "ArtTracker" );
