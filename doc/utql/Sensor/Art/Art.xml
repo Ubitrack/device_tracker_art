@@ -32,6 +32,42 @@
             <UbitrackLib class="ArtTracker"/>
         </DataflowConfiguration>
     </Pattern>
+	
+	<Pattern name="ARTTrackerWithLatency" displayName="A.R.T. Tracker (Pose) with Latency">
+        <Description><p xmlns="http://www.w3.org/1999/xhtml">The A.R.T tracker pattern</p></Description>
+		<Input>
+			<Node name="A" displayName="Sensor 1 (Reference)"/>
+			<Node name="B" displayName="Sensor 2 (Difference)"/>
+			
+			<Edge name="Latency" source="A" destination="B" displayName="Time difference [ms]">
+				<Description><h:p>The delay between the reference and this sensors' data measurements.</h:p></Description>
+                <Predicate>type=='Distance'&amp;&amp;mode=='push'</Predicate>
+			</Edge>
+		</Input>	
+        <Output>
+            <Node name="Art" displayName="A.R.T. Tracker">
+                <Description><p xmlns="http://www.w3.org/1999/xhtml">A.R.T. Tracker</p></Description>
+                <Attribute name="artPort" xsi:type="IntAttributeReferenceType"/>
+            </Node>
+            <Node name="Body" displayName="A.R.T. Marker">
+                <Description><p xmlns="http://www.w3.org/1999/xhtml">A.R.T. Tracker</p></Description>
+            </Node>
+            <Edge name="ArtToTarget" displayName="Tracked Transformation" source="Art" destination="Body">
+                <Attribute name="type" value="6D" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="mode" value="push" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="artBodyId" displayName="A.R.T. body ID" min="1" max="20" default="1" xsi:type="IntAttributeDeclarationType">
+                    <Description><p xmlns="http://www.w3.org/1999/xhtml">Body ID used by A.R.T. (configured in DTrack software)</p></Description>
+                </Attribute>
+                <Attribute name="artType" displayName="A.R.T. marker type" default="6d" xsi:type="EnumAttributeDeclarationType">
+                    <EnumValue name="6d" displayName="6D body"/>
+                    <EnumValue name="6dmt" displayName="6D measurement tool"/>
+                </Attribute>
+            </Edge>
+        </Output>
+        <DataflowConfiguration>
+            <UbitrackLib class="ArtTracker"/>
+        </DataflowConfiguration>
+    </Pattern>
 
     <!-- This pattern is bullshit! Should be refactored in Ubitrack so that only the 3DOutput edge remains. At the moment
     the ArtToTarget edge is needed only to set the artType attribute to the 3dcloud value.-->

@@ -93,6 +93,7 @@ static log4cpp::Category& logger( log4cpp::Category::getInstance( "Drivers.Art" 
 ArtModule::ArtModule( const ArtModuleKey& moduleKey, boost::shared_ptr< Graph::UTQLSubgraph >, FactoryHelper* pFactory )
 	: Module< ArtModuleKey, ArtComponentKey, ArtModule, ArtComponent >( moduleKey, pFactory )
 	, m_synchronizer( 60 ) // assume 60 Hz for timestamp synchronization
+	, m_latency(19000000)
 {}
 
 
@@ -158,7 +159,9 @@ void ArtModule::HandleReceive (const boost::system::error_code err, size_t lengt
 		// subtract the approximate processing time of the cameras and DTrack (19ms)
 		// (daniel) better synchronize the DTrack controller to a common NTP server and use "ts" fields directly.
 		//          This should work well at least with ARTtrack2/3 cameras (not necessarily ARTtrack/TP)
-		timestamp -= 19000000;
+		timestamp -= m_latency;
+
+		
 
 		// some error chekcing
 		if ( err && err != boost::asio::error::message_size )
@@ -715,6 +718,18 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
         getComponent( key )->getFingerPort( f ).send( pose );
     }
 }
+
+void ArtModule::setLatency(long int latency){
+	m_latency = latency;
+}
+
+void ArtComponent::receiveLatency( const Measurement::Distance& m ) {
+		double l = *m;
+		LOG4CPP_INFO( logger , "ArtComponent received new latency measurement in ms: " << l );
+		// convert ms to timestamp offset
+		long int latency = (long int)(1000000.0 * l);
+		getModule().setLatency(latency);
+};
 
 std::ostream& operator<<( std::ostream& s, const ArtComponentKey& k )
 {

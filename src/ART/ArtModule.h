@@ -46,6 +46,7 @@
 #include "UdpSocketSingleton.h"
 
 #include <utDataflow/PushSupplier.h>
+#include <utDataflow/PushConsumer.h>
 #include <utDataflow/Component.h>
 #include <utDataflow/Module.h>
 #include <utMeasurement/Measurement.h>
@@ -235,6 +236,8 @@ public:
 	/** thread method */
     void HandleReceive (const boost::system::error_code err, size_t length);
 
+	void setLatency(long int latency);
+
 protected:
     boost::shared_ptr< UdpSocketSingleton > m_pSocket;
 
@@ -244,6 +247,8 @@ protected:
 	boost::asio::ip::udp::endpoint sender_endpoint;
 
 	Measurement::TimestampSync m_synchronizer;
+
+	long int m_latency;
 
 private:
     void trySendPose( int id, ArtComponentKey::TargetType type, double qual, double* rot, double* mat, Ubitrack::Measurement::Timestamp ts );
@@ -271,6 +276,7 @@ public:
 		, m_fingerThumbPort( "fingerThumbOutput", *this )
 		, m_fingerIndexPort( "fingerIndexOutput", *this )
 		, m_fingerMiddlePort( "fingerMiddleOutput", *this )
+		, m_latencyPort("Latency", *this, boost::bind( &ArtComponent::receiveLatency, this, _1 ) )
 	{}
 	
 	/** destructor */
@@ -307,6 +313,8 @@ public:
 		return m_fingerHandPort;
 	}
 
+	void receiveLatency( const Measurement::Distance& m );
+
 protected:
 	// the port is the only member
 	PushSupplier< Ubitrack::Measurement::Pose > m_port;
@@ -316,6 +324,8 @@ protected:
 	PushSupplier< Ubitrack::Measurement::Pose > m_fingerThumbPort;
 	PushSupplier< Ubitrack::Measurement::Pose > m_fingerIndexPort;
 	PushSupplier< Ubitrack::Measurement::Pose > m_fingerMiddlePort;
+
+	PushConsumer< Ubitrack::Measurement::Distance > m_latencyPort;
 };
 
 } } // namespace Ubitrack::Drivers
