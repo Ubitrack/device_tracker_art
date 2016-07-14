@@ -31,6 +31,7 @@
 #include <utMath/Quaternion.h>
 #include <utMath/Pose.h>
 #include <utMath/Matrix.h>
+#include <utUtil/TracingProvider.h>
 
 #include <boost/array.hpp>
 
@@ -92,6 +93,7 @@ static log4cpp::Category& logger( log4cpp::Category::getInstance( "Drivers.Art" 
 
 ArtModule::ArtModule( const ArtModuleKey& moduleKey, boost::shared_ptr< Graph::UTQLSubgraph >, FactoryHelper* pFactory )
 	: Module< ArtModuleKey, ArtComponentKey, ArtModule, ArtComponent >( moduleKey, pFactory )
+	  // @todo art tracker update frequency should be configurable !!!
 	, m_synchronizer( 60 ) // assume 60 Hz for timestamp synchronization
 	, m_latency(19000000)
 {}
@@ -641,6 +643,9 @@ void ArtModule::trySendPose( boost::shared_ptr< std::vector< Ubitrack::Math::Vec
 	{
 		Ubitrack::Measurement::PositionList pc( ts, cloud );
 
+#ifdef ENABLE_EVENT_TRACING
+		TRACEPOINT_MEASUREMENT_CREATE(getComponent( key )->getEventDomain(), ts, getComponent( key )->getName().c_str(), "MarkerTracking")
+#endif
 		getComponent( key )->getCloudPort().send( pc );
 	}
 // 	else
@@ -687,7 +692,11 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
 
         //send it to the component
 		LOG4CPP_TRACE( logger, "Sending pose for id " << id+1 << " using " << getComponent( key )->getName() << ": " << pose );
-        getComponent( key )->getPort().send( pose );
+
+#ifdef ENABLE_EVENT_TRACING
+		TRACEPOINT_MEASUREMENT_CREATE(getComponent( key )->getEventDomain(), ts, getComponent( key )->getName().c_str(), "PoseTracking")
+#endif
+		getComponent( key )->getPort().send( pose );
     }
 	else {
 		LOG4CPP_TRACE( logger, "No component for body id " << id+1 );
@@ -715,6 +724,9 @@ void ArtModule::trySendPose( int id, ArtComponentKey::TargetType type, double qu
         Ubitrack::Measurement::Pose pose( ts, Ubitrack::Math::Pose( rotation, position ) );
 
         //send it to the component
+#ifdef ENABLE_EVENT_TRACING
+		TRACEPOINT_MEASUREMENT_CREATE(getComponent( key )->getEventDomain(), ts, getComponent( key )->getName().c_str(), "FingerTracking")
+#endif
         getComponent( key )->getFingerPort( f ).send( pose );
     }
 }
