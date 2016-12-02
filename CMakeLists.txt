@@ -1,5 +1,5 @@
 set(the_description "The UbiTrack ART Tracking Component")
-ut_add_component(ART DEPS utcore utdataflow )
+ut_add_component(device_tracker_art DEPS utcore utdataflow )
 ut_component_include_directories("src/ART" ${UBITRACK_CORE_DEPS_INCLUDE_DIR})
 ut_glob_component_sources(HEADERS "src/ART/*.h" SOURCES "src/ART/*.cpp")
 ut_create_single_component()
