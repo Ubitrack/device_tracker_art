@@ -1,6 +1,37 @@
-set(the_description "The UbiTrack ART Tracking Component")
-ut_add_component(device_tracker_art DEPS utcore utdataflow )
-ut_component_include_directories("src/ART" ${UBITRACK_CORE_DEPS_INCLUDE_DIR})
-ut_glob_component_sources(HEADERS "src/ART/*.h" SOURCES "src/ART/*.cpp")
-ut_create_single_component()
-ut_install_utql_patterns()
+project(ubitrack_device_tracker_art)
+
+cmake_minimum_required(VERSION 3.4.0)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(KEEP_RPATHS)
+
+include(GNUInstallDirs)
+include(cmake/UbitrackConfig)
+
+
+add_subdirectory(src/ART)
+
+
+# collect all utql patterns from module for installation
+file(GLOB _utql_patterns "doc/utql/*.xml" "doc/utql/*/*.xml"  "doc/utql/*/*/*.xml")
+foreach(pfile ${_utql_patterns})
+  string(REGEX REPLACE "^.*/doc/utql/" "" pfile2 "${pfile}")
+  GET_FILENAME_COMPONENT(fpath ${pfile2} PATH)
+  IF(fpath)
+	install(FILES ${pfile} DESTINATION "${UBITRACK_UTQLPATTERN_INSTALL_DIRECTORY}/${fpath}" COMPONENT data)
+  ELSE(fpath)
+    install(FILES ${pfile} DESTINATION "${UBITRACK_UTQLPATTERN_INSTALL_DIRECTORY}" COMPONENT data)
+  ENDIF(fpath)
+endforeach()
+
+# install custom files
+file(GLOB _doc_files LIST_DIRECTORIES false "doc/utqlDoc/*" "doc/utqlDoc/*/*" "doc/utqlDoc/*/*/*")
+foreach(pfile ${_doc_files})
+  string(REGEX REPLACE "^.*/doc/" "" pfile2 "${pfile}")
+  GET_FILENAME_COMPONENT(fpath ${pfile2} PATH)
+  IF(fpath)
+	install(FILES ${pfile} DESTINATION "${UBITRACK_DOC_INSTALL_DIRECTORY}/${fpath}" COMPONENT doc)
+  ELSE(fpath)
+    install(FILES ${pfile} DESTINATION "${UBITRACK_DOC_INSTALL_DIRECTORY}" COMPONENT doc)
+  ENDIF(fpath)
+endforeach()
